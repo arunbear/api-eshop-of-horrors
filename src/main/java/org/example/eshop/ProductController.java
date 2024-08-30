@@ -1,8 +1,6 @@
 package org.example.eshop;
 
 import org.example.eshop.dto.ProductDto;
-import org.example.eshop.entity.Product;
-import org.example.eshop.repository.ProductRepository;
 import org.example.eshop.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
