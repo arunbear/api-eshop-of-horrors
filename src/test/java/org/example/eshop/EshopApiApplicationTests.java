@@ -4,7 +4,6 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
-import org.assertj.core.api.Assertions;
 import org.example.eshop.dto.ProductDto;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,11 +32,7 @@ class EshopApiApplicationTests {
             .put("name", "Special Smelly Cheese")
             .put("price", 20.99);
 
-        ProductDto product = RestAssured
-            .given()
-            .contentType(ContentType.JSON)
-            .body(productToCreate.toString())
-            .post("/products")
+        ProductDto product = createProduct(productToCreate)
             .then()
             .statusCode(equalTo(HttpStatus.SC_CREATED))
             .header("Location", matchesRegex(".+/products/[1-9][0-9]*"))
@@ -57,21 +52,20 @@ class EshopApiApplicationTests {
         var productToCreate = new JSONObject()
             .put("name", "Highlander");
 
-        RestAssured
-            .given()
-            .contentType(ContentType.JSON)
-            .body(productToCreate.toString())
-            .post("/products")
-            ;
-        // Create it again
-        RestAssured
-            .given()
-            .contentType(ContentType.JSON)
-            .body(productToCreate.toString())
-            .post("/products")
+        createProduct(productToCreate);
+        createProduct(productToCreate)
             .then()
             .statusCode(equalTo(HttpStatus.SC_BAD_REQUEST))
             .body("message", equalTo("A product with name <Highlander> already exists"))
+        ;
+    }
+
+    Response createProduct(JSONObject jsonObject) {
+        return RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .body(jsonObject.toString())
+            .post("/products")
         ;
     }
 
