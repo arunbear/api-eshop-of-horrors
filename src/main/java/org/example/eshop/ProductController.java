@@ -26,11 +26,8 @@ public class ProductController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<ProductDto> create(@RequestBody ProductDto productDto) {
-        var newProduct = new Product();
-        newProduct.setName(productDto.name());
-        newProduct.setPrice(productDto.price());
-        var savedProduct = productService.save(newProduct);
 
+        var savedProduct   = productService.save(productDto);
         var createdProduct = productDto.withId(savedProduct.getId());
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
