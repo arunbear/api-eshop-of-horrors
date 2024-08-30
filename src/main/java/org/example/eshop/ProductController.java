@@ -1,6 +1,10 @@
 package org.example.eshop;
 
 import org.example.eshop.dto.ProductDto;
+import org.example.eshop.entity.Product;
+import org.example.eshop.repository.ProductRepository;
+import org.example.eshop.service.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,10 +16,22 @@ import java.net.URI;
 @RequestMapping("/products")
 public class ProductController {
 
+    private final ProductService productService;
+
+    @Autowired
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<ProductDto> create(@RequestBody ProductDto product) {
-        var createdProduct = product.withId(1);
+    public ResponseEntity<ProductDto> create(@RequestBody ProductDto productDto) {
+        var newProduct = new Product();
+        newProduct.setName(productDto.name());
+        newProduct.setPrice(productDto.price());
+        var savedProduct = productService.save(newProduct);
+
+        var createdProduct = productDto.withId(savedProduct.getId());
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/{id}")
