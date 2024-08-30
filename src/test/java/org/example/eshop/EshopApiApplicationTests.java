@@ -1,9 +1,8 @@
 package org.example.eshop;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.assertj.core.api.Assertions;
 import org.example.eshop.dto.ProductDto;
@@ -51,6 +50,29 @@ class EshopApiApplicationTests {
             .isEqualTo(productToCreate.getDouble("price"));
         assertThat(product.id())
             .isGreaterThan(0);
+    }
+
+    @Test
+    void duplicate_product_names_are_not_allowed() throws JSONException {
+        var productToCreate = new JSONObject()
+            .put("name", "Highlander");
+
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .body(productToCreate.toString())
+            .post("/products")
+            ;
+        // Create it again
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .body(productToCreate.toString())
+            .post("/products")
+            .then()
+            .statusCode(equalTo(HttpStatus.SC_BAD_REQUEST))
+            .body("message", equalTo("A product with name <Highlander> already exists"))
+        ;
     }
 
 }
