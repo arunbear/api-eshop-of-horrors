@@ -1,6 +1,5 @@
 package org.example.eshop.service;
 
-import org.example.eshop.DuplicateProductNameException;
 import org.example.eshop.InvalidProductNameException;
 import org.example.eshop.dto.ProductDto;
 import org.example.eshop.entity.Product;
