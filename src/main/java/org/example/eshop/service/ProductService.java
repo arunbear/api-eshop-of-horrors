@@ -1,6 +1,7 @@
 package org.example.eshop.service;
 
 import org.example.eshop.DuplicateProductNameException;
+import org.example.eshop.InvalidProductNameException;
 import org.example.eshop.dto.ProductDto;
 import org.example.eshop.entity.Product;
 import org.example.eshop.repository.ProductRepository;
@@ -31,11 +32,19 @@ public class ProductService {
                 .price(productDto.price())
                 .build();
         try {
-            return productRepository.save(product);
+            product = productRepository.save(product);
         }
         catch (DataIntegrityViolationException e) {
-            throw new DuplicateProductNameException(productDto.name());
+            // parsing error strings is brittle
+            if (e.getMessage().contains("Value too long for column")) {
+                throw new InvalidProductNameException("A product name cannot exceed 200 characters");
+            }
+            else if (e.getMessage().contains("Unique index or primary key violation")) {
+                var message = String.format("A product with name <%s> already exists", productDto.name());
+                throw new InvalidProductNameException(message);
+            }
         }
+        return product;
     }
 
     public Optional<Product> findById(Long id) {

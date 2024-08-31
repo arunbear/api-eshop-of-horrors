@@ -15,7 +15,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, length = 200)
     private String name;
 
     private double price;
