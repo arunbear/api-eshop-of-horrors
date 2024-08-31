@@ -2,6 +2,10 @@ package org.example.eshop.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
@@ -20,4 +24,12 @@ public class Product {
 
     private double price;
 
+    @CreationTimestamp
+    @Column(columnDefinition = "DATE")
+    private LocalDate addedAt;
+
+    public String getAddedAtAsString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        return addedAt.format(formatter);
+    }
 }

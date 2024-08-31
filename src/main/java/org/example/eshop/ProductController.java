@@ -26,7 +26,9 @@ public class ProductController {
     public ResponseEntity<ProductDto> create(@RequestBody ProductDto productDto) {
 
         var savedProduct   = productService.save(productDto);
-        var createdProduct = productDto.withId(savedProduct.getId());
+        var createdProduct = productDto
+            .withId(savedProduct.getId())
+            .withAddedAt(savedProduct.getAddedAtAsString());
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/{id}")

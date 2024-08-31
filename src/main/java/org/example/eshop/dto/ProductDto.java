@@ -5,5 +5,5 @@ import lombok.With;
 
 @Builder
 @With
-public record ProductDto(long id, String name, double price) {
+public record ProductDto(long id, String name, double price, String addedAt) {
 }
