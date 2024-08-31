@@ -9,11 +9,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.jdbc.JdbcTestUtils;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -48,6 +48,14 @@ class EshopApiApplicationTests {
             .isEqualTo(productToCreate.getDouble("price"));
         assertThat(product.id())
             .isGreaterThan(0);
+
+        assertThat(product.addedAt())
+            .isEqualTo(todayAsString());
+    }
+
+    String todayAsString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        return LocalDate.now().format(formatter);
     }
 
     @Test
