@@ -9,8 +9,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -57,6 +60,18 @@ class EshopApiApplicationTests {
             .then()
             .statusCode(equalTo(HttpStatus.SC_BAD_REQUEST))
             .body("message", equalTo("A product with name <Highlander> already exists"))
+        ;
+    }
+
+    @Test
+    void a_product_name_cannot_exceed_200_characters() throws JSONException {
+        var productToCreate = new JSONObject()
+                .put("name", "A".repeat(201));
+
+        createProduct(productToCreate)
+            .then()
+            .statusCode(equalTo(HttpStatus.SC_BAD_REQUEST))
+            .body("message", equalTo("A product name cannot exceed 200 characters"))
         ;
     }
 
