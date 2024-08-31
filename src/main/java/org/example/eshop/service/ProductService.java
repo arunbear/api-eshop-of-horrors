@@ -1,5 +1,6 @@
 package org.example.eshop.service;
 
+import org.example.eshop.InvalidProductLabelException;
 import org.example.eshop.InvalidProductNameException;
 import org.example.eshop.dto.ProductDto;
 import org.example.eshop.entity.Product;
@@ -9,6 +10,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class ProductService {
@@ -25,6 +27,8 @@ public class ProductService {
     }
 
     public Product save(ProductDto productDto) {
+        validateLabels(productDto);
+
         Product product = Product
                 .builder()
                 .name(productDto.name())
@@ -44,6 +48,15 @@ public class ProductService {
             }
         }
         return product;
+    }
+
+    private void validateLabels(ProductDto productDto) {
+        var allowedLabels = Set.of("food", "drink", "clothes", "limited");
+
+        for (String label: productDto.labels()) {
+            if (!allowedLabels.contains(label))
+                throw new InvalidProductLabelException(label);
+        }
     }
 
     public Optional<Product> findById(Long id) {

@@ -9,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Set;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
@@ -27,6 +29,7 @@ class ProductServiceTest {
         ProductDto productDto = ProductDto
                 .builder()
                 .name("Acme T Shirt")
+                .labels(Set.of())
                 .build();
         // when
         productService.save(productDto);
