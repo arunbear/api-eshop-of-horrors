@@ -5,8 +5,10 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.example.eshop.dto.ProductDto;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +16,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -31,9 +34,12 @@ class EshopApiApplicationTests {
 
     @Test
     void returns_details_of_a_new_product_on_POST_to_products() throws JSONException {
+        var labels = Set.of("food", "limited");
+
         var productToCreate = new JSONObject()
             .put("name", "Special Smelly Cheese")
-            .put("price", 20.99);
+            .put("price", 20.99)
+            .put("labels", new JSONArray(labels));
 
         ProductDto product = createProduct(productToCreate)
             .then()
@@ -51,6 +57,8 @@ class EshopApiApplicationTests {
 
         assertThat(product.addedAt())
             .isEqualTo(todayAsString());
+        assertThat(product.labels())
+            .containsExactlyInAnyOrderElementsOf(labels);
     }
 
     String todayAsString() {
