@@ -7,5 +7,5 @@ import java.util.Set;
 
 @Builder
 @With
-public record ProductDto(long id, String name, double price, String addedAt, Set<String> labels) {
+public record ProductDto(long productId, String name, double price, String addedAt, Set<String> labels) {
 }

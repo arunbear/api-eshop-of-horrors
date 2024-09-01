@@ -55,7 +55,7 @@ class EshopApiApplicationTests {
             .isEqualTo(productToCreate.getString("name"));
         assertThat(product.price())
             .isEqualTo(productToCreate.getDouble("price"));
-        assertThat(product.id())
+        assertThat(product.productId())
             .isGreaterThan(0);
 
         assertThat(product.addedAt())
@@ -78,7 +78,7 @@ class EshopApiApplicationTests {
             .extract()
             .as(ProductDto.class);
 
-        final String pathWithProductId = "/products/%d".formatted(createdProduct.id());
+        final String pathWithProductId = "/products/%d".formatted(createdProduct.productId());
 
         // when
         RestAssured

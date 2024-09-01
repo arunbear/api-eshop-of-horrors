@@ -30,12 +30,12 @@ public class ProductController {
 
         var savedProduct   = productService.save(productDto);
         var createdProduct = productDto
-            .withId(savedProduct.getId())
+            .withProductId(savedProduct.getId())
             .withAddedAt(savedProduct.getAddedAtAsString());
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-            .path("/{id}")
-            .buildAndExpand(createdProduct.id())
+            .path("/{productId}")
+            .buildAndExpand(createdProduct.productId())
             .toUri();
 
         return ResponseEntity.created(uri).body(createdProduct);

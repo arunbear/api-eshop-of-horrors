@@ -46,7 +46,7 @@ public class Product {
 
     public ProductDto toDto() {
         return ProductDto.builder()
-            .id(id)
+            .productId(id)
             .name(name)
             .price(price)
             .addedAt(getAddedAtAsString())
