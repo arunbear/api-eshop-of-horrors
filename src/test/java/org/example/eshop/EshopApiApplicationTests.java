@@ -18,7 +18,6 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -63,6 +62,40 @@ class EshopApiApplicationTests {
             .isEqualTo(todayAsString());
         assertThat(product.labels())
             .containsExactlyInAnyOrderElementsOf(labels);
+    }
+
+    @Test
+    void a_deleted_product_cannot_be_retrieved_by_id() throws JSONException {
+        // given
+
+        var productToCreate = new JSONObject()
+            .put("name", "Special Smelly Cheese")
+            .put("price", 20.99)
+            .put("labels", new JSONArray(Set.of("food", "limited")));
+
+        var createdProduct = createProduct(productToCreate)
+            .then()
+            .extract()
+            .as(ProductDto.class);
+
+        final String pathWithProductId = "/products/%d".formatted(createdProduct.id());
+
+        // when
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .delete(pathWithProductId)
+            .then()
+            .statusCode(equalTo(HttpStatus.SC_NO_CONTENT))
+            ;
+        // then
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .get(pathWithProductId)
+            .then()
+            .statusCode(equalTo(HttpStatus.SC_NOT_FOUND))
+        ;
     }
 
     @Test
