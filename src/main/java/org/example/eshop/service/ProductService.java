@@ -27,10 +27,6 @@ public class ProductService {
         this.labelRepository = labelRepository;
     }
 
-    public Product save(Product product) {
-        return productRepository.save(product);
-    }
-
     public Product save(ProductDto productDto) {
         validateLabels(productDto);
 
