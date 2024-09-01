@@ -74,4 +74,10 @@ public class ProductService {
         return products.stream().map(Product::toDto).toList();
 
     }
+
+    public void delete(long id) {
+        // We may want to do something if the product does not exist,
+        // which this cannot do
+        productRepository.deleteById(id);
+    }
 }

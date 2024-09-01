@@ -41,6 +41,12 @@ public class ProductController {
         return ResponseEntity.created(uri).body(createdProduct);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable long id) {
+        productService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ProductDto> retrieve(@PathVariable long id) {
         Optional<Product> products = productService.findById(id);
