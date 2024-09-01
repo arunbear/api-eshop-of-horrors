@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -49,6 +50,12 @@ public class ProductController {
         else {
             return ResponseEntity.ok(products.get().toDto());
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProductDto>> retrieveAll() {
+        List<ProductDto> products = productService.findAll();
+        return ResponseEntity.ok(products);
     }
 
 }
