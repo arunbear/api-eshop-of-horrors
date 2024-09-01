@@ -8,11 +8,13 @@ import org.example.eshop.dto.ProductDto;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -58,6 +60,36 @@ class EshopApiApplicationTests {
         assertThat(product.addedAt())
             .isEqualTo(todayAsString());
         assertThat(product.labels())
+            .containsExactlyInAnyOrderElementsOf(labels);
+    }
+
+    @Test
+    void an_existing_product_can_be_retrieved_by_id() throws JSONException {
+        var labels = Set.of("food", "limited");
+
+        var productToCreate = new JSONObject()
+            .put("name", "Special Smelly Cheese")
+            .put("price", 20.99)
+            .put("labels", new JSONArray(labels));
+
+        var creationResponse = createProduct(productToCreate);
+
+        ProductDto retrievedProduct = RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .get(creationResponse.header("Location"))
+            .then()
+            .extract()
+            .as(ProductDto.class)
+        ;
+        assertThat(retrievedProduct.name())
+            .isEqualTo(productToCreate.getString("name"));
+        assertThat(retrievedProduct.price())
+            .isEqualTo(productToCreate.getDouble("price"));
+
+        assertThat(retrievedProduct.addedAt())
+            .isEqualTo(todayAsString());
+        assertThat(retrievedProduct.labels())
             .containsExactlyInAnyOrderElementsOf(labels);
     }
 
@@ -108,6 +140,15 @@ class EshopApiApplicationTests {
             .statusCode(equalTo(HttpStatus.SC_BAD_REQUEST))
             .body("message", equalTo("A product name cannot exceed 200 characters"))
         ;
+    }
+
+    @BeforeEach
+    void clearDatabase(@Autowired JdbcTemplate jdbcTemplate) {
+        JdbcTestUtils.deleteFromTables(jdbcTemplate,
+            "product_labels",
+            "label",
+            "product"
+        );
     }
 
     Response createProduct(JSONObject jsonObject) {
