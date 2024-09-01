@@ -18,6 +18,8 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,6 +93,63 @@ class EshopApiApplicationTests {
             .isEqualTo(todayAsString());
         assertThat(retrievedProduct.labels())
             .containsExactlyInAnyOrderElementsOf(labels);
+    }
+
+    @Test
+    void a_list_of_all_products_can_be_retrieved() throws JSONException {
+        // given
+        var labelSets = List.of(
+            Set.of("drink", "food"),
+            Set.of("food")
+        );
+        final int first  = 0;
+        final int second = 1;
+
+        var productsToCreate = List.of(
+            new JSONObject()
+                .put("name", "Fancy IPA Beer")
+                .put("price", 5.99)
+                .put("labels", new JSONArray(labelSets.getFirst())),
+            new JSONObject()
+                .put("name", "Delicious Cake")
+                .put("price", 10.11)
+                .put("labels", new JSONArray(labelSets.get(second)))
+        );
+        productsToCreate.forEach(this::createProduct);
+
+        // when
+        ProductDto[] retrievedProducts = RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .get("/products")
+            .then()
+            .statusCode(equalTo(HttpStatus.SC_OK))
+            .extract()
+            .as(ProductDto[].class)
+        ;
+        // then
+        assertThat(retrievedProducts.length).isEqualTo(2);
+
+        assertThat(retrievedProducts[first].name())
+            .isEqualTo(productsToCreate.getFirst().getString("name"));
+        assertThat(retrievedProducts[first].price())
+            .isEqualTo(productsToCreate.getFirst().getDouble("price"));
+
+        assertThat(retrievedProducts[first].addedAt())
+            .isEqualTo(todayAsString());
+        assertThat(retrievedProducts[first].labels())
+            .containsExactlyInAnyOrderElementsOf(labelSets.getFirst());
+
+        // and
+        assertThat(retrievedProducts[second].name())
+            .isEqualTo(productsToCreate.get(second).getString("name"));
+        assertThat(retrievedProducts[second].price())
+            .isEqualTo(productsToCreate.get(second).getDouble("price"));
+
+        assertThat(retrievedProducts[second].addedAt())
+            .isEqualTo(todayAsString());
+        assertThat(retrievedProducts[second].labels())
+            .containsExactlyInAnyOrderElementsOf(labelSets.get(second));
     }
 
     @Test
