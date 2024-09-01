@@ -1,6 +1,7 @@
 package org.example.eshop;
 
 import org.example.eshop.dto.ProductDto;
+import org.example.eshop.entity.Product;
 import org.example.eshop.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
@@ -36,6 +38,17 @@ public class ProductController {
             .toUri();
 
         return ResponseEntity.created(uri).body(createdProduct);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductDto> retrieve(@PathVariable long id) {
+        Optional<Product> products = productService.findById(id);
+        if (products.isEmpty()) {
+             return ResponseEntity.notFound().build();
+        }
+        else {
+            return ResponseEntity.ok(products.get().toDto());
+        }
     }
 
 }

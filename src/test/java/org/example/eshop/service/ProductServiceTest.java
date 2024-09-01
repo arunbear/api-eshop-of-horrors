@@ -36,4 +36,15 @@ class ProductServiceTest {
 
         verify(mockProductRepository).save(any(Product.class));
     }
+
+    @Test
+    void a_product_repository_is_used_to_find_products() {
+        // Given
+        long productId = 1;
+
+        // when
+        productService.findById(productId);
+
+        verify(mockProductRepository).findById(productId);
+    }
 }

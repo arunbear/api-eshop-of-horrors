@@ -3,7 +3,9 @@ package org.example.eshop.service;
 import org.example.eshop.InvalidProductLabelException;
 import org.example.eshop.InvalidProductNameException;
 import org.example.eshop.dto.ProductDto;
+import org.example.eshop.entity.Label;
 import org.example.eshop.entity.Product;
+import org.example.eshop.repository.LabelRepository;
 import org.example.eshop.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,10 +18,12 @@ import java.util.Set;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final LabelRepository   labelRepository;
 
     @Autowired
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, LabelRepository labelRepository) {
         this.productRepository = productRepository;
+        this.labelRepository = labelRepository;
     }
 
     public Product save(Product product) {
@@ -29,12 +33,17 @@ public class ProductService {
     public Product save(ProductDto productDto) {
         validateLabels(productDto);
 
-        Product product = Product
-                .builder()
-                .name(productDto.name())
-                .price(productDto.price())
-                .build();
+        Product product = new Product();
+        product.setName(productDto.name());
+        product.setPrice(productDto.price());
+
         try {
+            for (String label: productDto.labels()) {
+                var productLabel = labelRepository
+                    .findByName(label)
+                    .orElseGet(() -> labelRepository.save(new Label(label)));
+                product.addLabel(productLabel);
+            }
             product = productRepository.save(product);
         }
         catch (DataIntegrityViolationException e) {
