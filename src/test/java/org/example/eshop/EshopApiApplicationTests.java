@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
+import org.example.eshop.dto.CartDto;
 import org.example.eshop.dto.ProductDto;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -232,6 +233,23 @@ class EshopApiApplicationTests {
             .statusCode(equalTo(HttpStatus.SC_BAD_REQUEST))
             .body("message", equalTo("A product name cannot exceed 200 characters"))
         ;
+    }
+
+    @Test
+    void a_new_cart_is_empty_and_not_checked_out() {
+        CartDto cartDto = RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .post("/carts")
+            .then()
+            .statusCode(equalTo(HttpStatus.SC_CREATED))
+            .header("Location", matchesRegex(".+/carts/[1-9][0-9]*"))
+            .extract()
+            .as(CartDto.class);
+        ;
+        assertThat(cartDto.cartId()).isGreaterThan(0);
+        assertThat(cartDto.checkedOut()).isFalse();
+        assertThat(cartDto.products()).isEmpty();
     }
 
     @BeforeEach
