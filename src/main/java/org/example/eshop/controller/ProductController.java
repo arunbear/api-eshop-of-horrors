@@ -1,4 +1,4 @@
-package org.example.eshop;
+package org.example.eshop.controller;
 
 import org.example.eshop.dto.ProductDto;
 import org.example.eshop.entity.Product;
