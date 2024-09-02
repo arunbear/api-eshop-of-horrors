@@ -254,6 +254,54 @@ class EshopApiApplicationTests {
     }
 
     @Test
+    void a_list_of_all_carts_can_be_retrieved() throws JSONException {
+        // given
+        CartDto cartDto1 = createCart()
+                .then()
+                .extract()
+                .as(CartDto.class);
+
+        var productsForCart1 = new JSONObject()
+            .put("product_id", 1)
+            .put("quantity", 2)
+            ;
+        CartDto modifiedCart1 = RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .body(new JSONArray(List.of(productsForCart1)).toString())
+                .put( "/carts/%d".formatted(cartDto1.cartId()) )
+                .then()
+                .extract()
+                .as(CartDto.class);
+        // and
+        CartDto cartDto2 = createCart()
+                .then()
+                .extract()
+                .as(CartDto.class);
+
+        CartDto modifiedCart2 = RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .body(new JSONArray(List.of()).toString())
+                .put( "/carts/%d".formatted(cartDto2.cartId()) )
+                .then()
+                .extract()
+                .as(CartDto.class);
+        // when
+        CartDto[] cartDtos = RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .get("/carts")
+            .then()
+            .log().body()
+            .statusCode(equalTo(HttpStatus.SC_OK))
+            .extract()
+            .as(CartDto[].class);
+        assertThat(cartDtos)
+            .isEqualTo(new CartDto[]{modifiedCart1, modifiedCart2});
+    }
+
+    @Test
     void products_can_be_added_to_a_cart() throws JSONException {
         // given
         CartDto cartDto = createCart()
@@ -301,12 +349,12 @@ class EshopApiApplicationTests {
     @Test
     void a_cart_can_be_checked_out() throws JSONException {
         // given
-        var productFoCart = new JSONObject()
+        var productForCart = new JSONObject()
             .put("name", "Special Smelly Cheese")
             .put("price", 10.0)
             .put("labels", new JSONArray(Set.of()));
 
-        var createdProduct = createProduct(productFoCart)
+        var createdProduct = createProduct(productForCart)
             .then()
             .extract()
             .as(ProductDto.class);
@@ -350,7 +398,9 @@ class EshopApiApplicationTests {
         JdbcTestUtils.deleteFromTables(jdbcTemplate,
             "product_labels",
             "label",
-            "product"
+            "product",
+            "cart_cart_items",
+            "cart"
         );
     }
 
