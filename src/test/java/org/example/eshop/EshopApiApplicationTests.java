@@ -5,6 +5,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.example.eshop.dto.CartDto;
+import org.example.eshop.dto.CartItemDto;
 import org.example.eshop.dto.ProductDto;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -252,6 +253,49 @@ class EshopApiApplicationTests {
         assertThat(cartDto.products()).isEmpty();
     }
 
+    @Test
+    void products_can_be_added_to_a_cart() throws JSONException {
+        // given
+        CartDto cartDto = createCart()
+            .then()
+            .extract()
+            .as(CartDto.class);
+
+        var productToAdd = new JSONObject()
+            .put("product_id", 1)
+            .put("quantity", 2)
+            ;
+        var cartItemsToUpdate = List.of(productToAdd);
+
+        CartDto modifiedCartDto = RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .body(new JSONArray(cartItemsToUpdate).toString())
+            .put( "/carts/%d".formatted(cartDto.cartId()) )
+            .then()
+            .statusCode(equalTo(HttpStatus.SC_OK))
+            .extract()
+            .as(CartDto.class);
+        ;
+        assertThat(
+            modifiedCartDto.cartId())
+            .isEqualTo(cartDto.cartId());
+        assertThat(modifiedCartDto.checkedOut()).isFalse();
+        assertThat(
+            modifiedCartDto.products())
+            .hasSameSizeAs(cartItemsToUpdate);
+
+        // this is a bit messy
+        for (int i = 0; i < cartItemsToUpdate.size(); i++) {
+            assertThat(
+                modifiedCartDto.products().get(i).productId())
+                .isEqualTo(cartItemsToUpdate.get(i).getLong("product_id"));
+            assertThat(
+                modifiedCartDto.products().get(i).quantity())
+                .isEqualTo(cartItemsToUpdate.get(i).getInt("quantity"));
+        }
+    }
+
     @BeforeEach
     void clearDatabase(@Autowired JdbcTemplate jdbcTemplate) {
         JdbcTestUtils.deleteFromTables(jdbcTemplate,
@@ -268,6 +312,10 @@ class EshopApiApplicationTests {
             .body(jsonObject.toString())
             .post("/products")
         ;
+    }
+
+    Response createCart() {
+        return RestAssured.given().post("/carts");
     }
 
 }
