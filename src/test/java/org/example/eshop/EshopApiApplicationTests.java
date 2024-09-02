@@ -341,7 +341,8 @@ class EshopApiApplicationTests {
             .as(CheckOutDto.class);
         // then
         assertThat(checkOutDto.cart().checkedOut()).isTrue();
-//        assertThat(checkOutDto.totalCost()).isEqualTo(20.0);
+        assertThat(checkOutDto.totalCost()).isEqualTo(20.0);
+        assertThat(checkOutDto.cart()).isEqualTo(modifiedCart.withCheckedOut(true));
     }
 
     @BeforeEach
