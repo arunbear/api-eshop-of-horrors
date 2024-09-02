@@ -5,7 +5,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.example.eshop.dto.CartDto;
-import org.example.eshop.dto.CartItemDto;
+import org.example.eshop.dto.CheckOutDto;
 import org.example.eshop.dto.ProductDto;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -267,6 +267,7 @@ class EshopApiApplicationTests {
             ;
         var cartItemsToUpdate = List.of(productToAdd);
 
+        // when
         CartDto modifiedCartDto = RestAssured
             .given()
             .contentType(ContentType.JSON)
@@ -277,6 +278,7 @@ class EshopApiApplicationTests {
             .extract()
             .as(CartDto.class);
         ;
+        // then
         assertThat(
             modifiedCartDto.cartId())
             .isEqualTo(cartDto.cartId());
@@ -294,6 +296,52 @@ class EshopApiApplicationTests {
                 modifiedCartDto.products().get(i).quantity())
                 .isEqualTo(cartItemsToUpdate.get(i).getInt("quantity"));
         }
+    }
+
+    @Test
+    void a_cart_can_be_checked_out() throws JSONException {
+        // given
+        var productFoCart = new JSONObject()
+            .put("name", "Special Smelly Cheese")
+            .put("price", 10.0)
+            .put("labels", new JSONArray(Set.of()));
+
+        var createdProduct = createProduct(productFoCart)
+            .then()
+            .extract()
+            .as(ProductDto.class);
+
+        var cartToCheckOut = createCart()
+            .then()
+            .extract()
+            .as(CartDto.class);
+
+        var productToAdd = new JSONObject()
+            .put("product_id", createdProduct.productId())
+            .put("quantity", 2)
+            ;
+        var cartItemsToUpdate = List.of(productToAdd);
+
+        CartDto modifiedCart = RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .body(new JSONArray(cartItemsToUpdate).toString())
+            .put( "/carts/%d".formatted(cartToCheckOut.cartId()) )
+            .then()
+            .extract()
+            .as(CartDto.class);
+        // when
+        CheckOutDto checkOutDto = RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .post( "/carts/%d/checkout".formatted(cartToCheckOut.cartId()) )
+            .then()
+            .statusCode(equalTo(HttpStatus.SC_OK))
+            .extract()
+            .as(CheckOutDto.class);
+        // then
+        assertThat(checkOutDto.cart().checkedOut()).isTrue();
+//        assertThat(checkOutDto.totalCost()).isEqualTo(20.0);
     }
 
     @BeforeEach
