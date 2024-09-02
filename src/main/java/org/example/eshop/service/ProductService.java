@@ -1,7 +1,7 @@
 package org.example.eshop.service;
 
-import org.example.eshop.InvalidProductLabelException;
-import org.example.eshop.InvalidProductNameException;
+import org.example.eshop.exception.InvalidProductLabelException;
+import org.example.eshop.exception.InvalidProductNameException;
 import org.example.eshop.dto.ProductDto;
 import org.example.eshop.entity.Label;
 import org.example.eshop.entity.Product;

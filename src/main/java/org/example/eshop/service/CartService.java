@@ -1,7 +1,7 @@
 package org.example.eshop.service;
 
-import org.example.eshop.CartNotFoundException;
-import org.example.eshop.ProductNotFoundException;
+import org.example.eshop.exception.CartNotFoundException;
+import org.example.eshop.exception.ProductNotFoundException;
 import org.example.eshop.dto.CartDto;
 import org.example.eshop.dto.CartItemDto;
 import org.example.eshop.dto.CheckOutDto;
