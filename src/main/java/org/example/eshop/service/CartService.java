@@ -85,4 +85,9 @@ public class CartService {
         foundCart.setCartItems(newItems);
         cartRepository.save(foundCart);
     }
+
+    public List<CartDto> findAll() {
+        var carts = cartRepository.findAll();
+        return carts.stream().map(cart -> cart.toDto()).toList();
+    }
 }

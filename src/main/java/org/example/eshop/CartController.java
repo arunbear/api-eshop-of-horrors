@@ -3,6 +3,7 @@ package org.example.eshop;
 import org.example.eshop.dto.CartDto;
 import org.example.eshop.dto.CartItemDto;
 import org.example.eshop.dto.CheckOutDto;
+import org.example.eshop.dto.ProductDto;
 import org.example.eshop.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -52,5 +53,11 @@ public class CartController {
         CheckOutDto checkOutDto = cartService.checkOutCart(cartId);
 
         return ResponseEntity.ok(checkOutDto);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CartDto>> retrieveAll() {
+        List<CartDto> carts = cartService.findAll();
+        return ResponseEntity.ok(carts);
     }
 }
