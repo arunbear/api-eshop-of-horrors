@@ -2,6 +2,7 @@ package org.example.eshop;
 
 import org.example.eshop.dto.CartDto;
 import org.example.eshop.dto.CartItemDto;
+import org.example.eshop.dto.CheckOutDto;
 import org.example.eshop.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,5 +44,16 @@ public class CartController {
             .build();
 
         return ResponseEntity.ok(cartDto);
+    }
+
+    @PostMapping("/{cartId}/checkout")
+    public ResponseEntity<CheckOutDto> checkOut(@PathVariable long cartId) {
+        CartDto cartDto = cartService.checkOutCart(cartId);
+
+        CheckOutDto checkOutDto = CheckOutDto.builder()
+            .cart(cartDto)
+            .build();
+
+        return ResponseEntity.ok(checkOutDto);
     }
 }
