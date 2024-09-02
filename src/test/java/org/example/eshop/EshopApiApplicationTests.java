@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
+import org.assertj.core.api.Assertions;
 import org.example.eshop.dto.CartDto;
 import org.example.eshop.dto.CheckOutDto;
 import org.example.eshop.dto.ProductDto;
@@ -11,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -347,6 +349,18 @@ class EshopApiApplicationTests {
     }
 
     @Test
+    @Disabled
+    void products_can_be_removed_from_a_cart() {
+        Assertions.fail("To be added");
+    }
+
+    @Test
+    @Disabled
+    void non_existent_products_cannot_be_added_to_a_cart() {
+        Assertions.fail("To be added");
+    }
+
+    @Test
     void a_cart_can_be_checked_out() throws JSONException {
         // given
         var productForCart = new JSONObject()
@@ -392,6 +406,12 @@ class EshopApiApplicationTests {
         assertThat(checkOutDto.cart().checkedOut()).isTrue();
         assertThat(checkOutDto.totalCost()).isEqualTo(20.0);
         assertThat(checkOutDto.cart()).isEqualTo(modifiedCart.withCheckedOut(true));
+    }
+
+    @Test
+    @Disabled
+    void a_checked_out_cart_cannot_be_modified() {
+        Assertions.fail("To be added");
     }
 
     @BeforeEach
