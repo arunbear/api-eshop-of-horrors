@@ -48,6 +48,7 @@ class EshopApiApplicationTests {
 
         ProductDto product = createProduct(productToCreate)
             .then()
+            .log().body()
             .statusCode(equalTo(HttpStatus.SC_CREATED))
             .header("Location", matchesRegex(".+/products/[1-9][0-9]*"))
             .extract()
@@ -116,6 +117,7 @@ class EshopApiApplicationTests {
             .contentType(ContentType.JSON)
             .get(creationResponse.header("Location"))
             .then()
+            .log().body()
             .extract()
             .as(ProductDto.class)
         ;
@@ -158,6 +160,7 @@ class EshopApiApplicationTests {
             .contentType(ContentType.JSON)
             .get("/products")
             .then()
+            .log().body()
             .statusCode(equalTo(HttpStatus.SC_OK))
             .extract()
             .as(ProductDto[].class)
@@ -200,11 +203,6 @@ class EshopApiApplicationTests {
             .statusCode(equalTo(HttpStatus.SC_BAD_REQUEST))
             .body("message", equalTo("Invalid product label <books>"))
         ;
-    }
-
-    String todayAsString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-        return LocalDate.now().format(formatter);
     }
 
     @Test
@@ -414,6 +412,11 @@ class EshopApiApplicationTests {
             .body(jsonObject.toString())
             .post("/products")
         ;
+    }
+
+    String todayAsString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        return LocalDate.now().format(formatter);
     }
 
     Response createCart() {
