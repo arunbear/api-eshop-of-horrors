@@ -243,6 +243,7 @@ class EshopApiApplicationTests {
             .contentType(ContentType.JSON)
             .post("/carts")
             .then()
+            .log().body()
             .statusCode(equalTo(HttpStatus.SC_CREATED))
             .header("Location", matchesRegex(".+/carts/[1-9][0-9]*"))
             .extract()
@@ -322,6 +323,7 @@ class EshopApiApplicationTests {
             .body(new JSONArray(cartItemsToUpdate).toString())
             .put( "/carts/%d".formatted(cartDto.cartId()) )
             .then()
+            .log().body()
             .statusCode(equalTo(HttpStatus.SC_OK))
             .extract()
             .as(CartDto.class);
@@ -384,6 +386,7 @@ class EshopApiApplicationTests {
             .contentType(ContentType.JSON)
             .post( "/carts/%d/checkout".formatted(cartToCheckOut.cartId()) )
             .then()
+            .log().body()
             .statusCode(equalTo(HttpStatus.SC_OK))
             .extract()
             .as(CheckOutDto.class);
