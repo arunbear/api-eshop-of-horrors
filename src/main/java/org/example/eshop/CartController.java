@@ -42,17 +42,14 @@ public class CartController {
             .cartId(cartId)
             .products(updates)
             .build();
+        cartService.applyUpdates(cartId, updates);
 
         return ResponseEntity.ok(cartDto);
     }
 
     @PostMapping("/{cartId}/checkout")
     public ResponseEntity<CheckOutDto> checkOut(@PathVariable long cartId) {
-        CartDto cartDto = cartService.checkOutCart(cartId);
-
-        CheckOutDto checkOutDto = CheckOutDto.builder()
-            .cart(cartDto)
-            .build();
+        CheckOutDto checkOutDto = cartService.checkOutCart(cartId);
 
         return ResponseEntity.ok(checkOutDto);
     }
