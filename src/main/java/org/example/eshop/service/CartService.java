@@ -72,6 +72,14 @@ public class CartService {
     public void applyUpdates(long cartId, List<CartItemDto> updates) {
         Cart foundCart = cartRepository.findById(cartId)
             .orElseThrow(() -> new CartNotFoundException(cartId));
+
+        Set<CartItem> newItems = createNewCartItems(updates);
+        foundCart.setCartItems(newItems);
+
+        cartRepository.save(foundCart);
+    }
+
+    private Set<CartItem> createNewCartItems(List<CartItemDto> updates) {
         Set<CartItem> newItems = new HashSet<>();
 
         for (CartItemDto cartItemDto: updates) {
@@ -84,9 +92,7 @@ public class CartService {
             cartItemRepository.save(item);
             newItems.add(item);
         }
-
-        foundCart.setCartItems(newItems);
-        cartRepository.save(foundCart);
+        return newItems;
     }
 
     public List<CartDto> findAll() {
