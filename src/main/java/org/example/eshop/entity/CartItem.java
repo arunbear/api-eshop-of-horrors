@@ -17,6 +17,12 @@ public class CartItem {
     @ManyToOne
     Cart cart;
 
-    private Long productId;
+    @OneToOne
+    private Product product;
+
     private Integer quantity;
+
+    public long getProductId() {
+        return product.getId();
+    }
 }

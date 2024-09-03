@@ -76,7 +76,10 @@ public class CartService {
 
         for (CartItemDto cartItemDto: updates) {
             CartItem item = new CartItem();
-            item.setProductId(cartItemDto.productId());
+            Product product = productRepository.findById(cartItemDto.productId())
+                .orElseThrow(() -> new ProductNotFoundException(cartItemDto.productId()));
+
+            item.setProduct(product);
             item.setQuantity(cartItemDto.quantity());
             cartItemRepository.save(item);
             newItems.add(item);

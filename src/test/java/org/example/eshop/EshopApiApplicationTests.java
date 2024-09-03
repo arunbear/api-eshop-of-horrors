@@ -247,7 +247,7 @@ class EshopApiApplicationTests {
             .header("Location", matchesRegex(".+/carts/[1-9][0-9]*"))
             .extract()
             .as(CartDto.class);
-        ;
+
         assertThat(cartDto.cartId()).isGreaterThan(0);
         assertThat(cartDto.checkedOut()).isFalse();
         assertThat(cartDto.products()).isEmpty();
@@ -261,16 +261,28 @@ class EshopApiApplicationTests {
                 .extract()
                 .as(CartDto.class);
 
-        var productsForCart1 = new JSONObject()
-            .put("product_id", 1)
+        var newProduct = new JSONObject()
+            .put("name", "Special Smelly Cheese")
+            .put("price", 10.0)
+            .put("labels", new JSONArray(Set.of()));
+
+        var createdProduct = createProduct(newProduct)
+            .then()
+            .extract()
+            .as(ProductDto.class);
+
+        var productForCart1 = new JSONObject()
+            .put("product_id", createdProduct.productId())
             .put("quantity", 2)
             ;
         CartDto modifiedCart1 = RestAssured
                 .given()
                 .contentType(ContentType.JSON)
-                .body(new JSONArray(List.of(productsForCart1)).toString())
+                .body(new JSONArray(List.of(productForCart1)).toString())
                 .put( "/carts/%d".formatted(cartDto1.cartId()) )
                 .then()
+                .log().body()
+                .statusCode(equalTo(HttpStatus.SC_OK))
                 .extract()
                 .as(CartDto.class);
         // and
@@ -309,8 +321,17 @@ class EshopApiApplicationTests {
             .extract()
             .as(CartDto.class);
 
+        var productForCart = new JSONObject()
+                .put("name", "Special Smelly Cheese")
+                .put("price", 10.0)
+                .put("labels", new JSONArray(Set.of()));
+
+        var createdProduct = createProduct(productForCart)
+                .then()
+                .extract()
+                .as(ProductDto.class);
         var productToAdd = new JSONObject()
-            .put("product_id", 1)
+            .put("product_id", createdProduct.productId())
             .put("quantity", 2)
             ;
         var cartItemsToUpdate = List.of(productToAdd);
@@ -326,7 +347,7 @@ class EshopApiApplicationTests {
             .statusCode(equalTo(HttpStatus.SC_OK))
             .extract()
             .as(CartDto.class);
-        ;
+
         // then
         assertThat(
             modifiedCartDto.cartId())
@@ -416,10 +437,11 @@ class EshopApiApplicationTests {
     @BeforeEach
     void clearDatabase(@Autowired JdbcTemplate jdbcTemplate) {
         JdbcTestUtils.deleteFromTables(jdbcTemplate,
+            "cart_cart_items",
+            "cart_item",
             "product_labels",
             "label",
             "product",
-            "cart_cart_items",
             "cart"
         );
     }
