@@ -377,6 +377,7 @@ class EshopApiApplicationTests {
     @Test
     @Disabled
     void non_existent_products_cannot_be_added_to_a_cart() {
+        // This is indirectly tested in a_list_of_all_carts_can_be_retrieved()
         Assertions.fail("To be added");
     }
 
