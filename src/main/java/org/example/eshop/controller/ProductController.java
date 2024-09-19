@@ -1,5 +1,6 @@
 package org.example.eshop.controller;
 
+import jakarta.validation.Valid;
 import org.example.eshop.dto.ProductDto;
 import org.example.eshop.entity.Product;
 import org.example.eshop.service.ProductService;
@@ -26,7 +27,7 @@ public class ProductController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<ProductDto> create(@RequestBody ProductDto productDto) {
+    public ResponseEntity<ProductDto> create(@Valid @RequestBody ProductDto productDto) {
 
         var savedProduct   = productService.save(productDto);
         var createdProduct = productDto

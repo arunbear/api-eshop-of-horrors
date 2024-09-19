@@ -197,11 +197,13 @@ class EshopApiApplicationTests {
         var labels = Set.of("food", "drink", "clothes", "limited", "books");
 
         var productToCreate = new JSONObject()
+            .put("name", "Delicious Cake")
             .put("labels", new JSONArray(labels))
         ;
 
         createProduct(productToCreate)
             .then()
+            .log().body()
             .statusCode(equalTo(HttpStatus.SC_BAD_REQUEST))
             .body("message", equalTo("Invalid product label <books>"))
         ;
