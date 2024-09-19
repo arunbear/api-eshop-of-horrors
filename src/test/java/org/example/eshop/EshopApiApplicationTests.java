@@ -8,6 +8,7 @@ import org.assertj.core.api.Assertions;
 import org.example.eshop.dto.CartDto;
 import org.example.eshop.dto.CheckOutDto;
 import org.example.eshop.dto.ProductDto;
+import org.example.eshop.error.ErrorResponseModel;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -219,6 +220,23 @@ class EshopApiApplicationTests {
             .statusCode(equalTo(HttpStatus.SC_BAD_REQUEST))
             .body("message", equalTo("A product with name <Highlander> already exists"))
         ;
+    }
+
+    @Test
+    void a_product_cannot_be_created_with_no_name() throws JSONException {
+        var productToCreate = new JSONObject()
+            .put("labels", new JSONArray(Set.of()))
+            ;
+
+        ErrorResponseModel errorResponseModel = createProduct(productToCreate)
+            .then()
+            .log().body()
+            .statusCode(equalTo(HttpStatus.SC_UNPROCESSABLE_ENTITY))
+            .extract()
+            .as(ErrorResponseModel.class)
+            ;
+        assertThat(errorResponseModel.errors()).hasSize(1);
+        assertThat(errorResponseModel.errors().getFirst().getDetail()).isEqualTo("name must be present");
     }
 
     @Test
