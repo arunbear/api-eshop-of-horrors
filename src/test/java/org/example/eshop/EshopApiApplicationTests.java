@@ -197,7 +197,8 @@ class EshopApiApplicationTests {
         var labels = Set.of("food", "drink", "clothes", "limited", "books");
 
         var productToCreate = new JSONObject()
-            .put("name", "Delicious Cake")
+            .put("name", "Highlander")
+            .put("price", 2.99)
             .put("labels", new JSONArray(labels))
         ;
 
@@ -213,12 +214,14 @@ class EshopApiApplicationTests {
     void duplicate_product_names_are_not_allowed() throws JSONException {
         var productToCreate = new JSONObject()
             .put("name", "Highlander")
+            .put("price", 2.99)
             .put("labels", new JSONArray(Set.of()))
         ;
 
         createProduct(productToCreate);
         createProduct(productToCreate)
             .then()
+            .log().body()
             .statusCode(equalTo(HttpStatus.SC_BAD_REQUEST))
             .body("message", equalTo("A product with name <Highlander> already exists"))
         ;
@@ -227,6 +230,7 @@ class EshopApiApplicationTests {
     @Test
     void a_product_cannot_be_created_with_no_name() throws JSONException {
         var productToCreate = new JSONObject()
+            .put("price", 2.99)
             .put("labels", new JSONArray(Set.of()))
             ;
 
@@ -242,14 +246,35 @@ class EshopApiApplicationTests {
     }
 
     @Test
+    void a_product_cannot_be_created_with_no_price() throws JSONException {
+        var productToCreate = new JSONObject()
+            .put("name", "Delicious Cake")
+            .put("labels", new JSONArray(Set.of()))
+            ;
+
+        ErrorResponseModel errorResponseModel = createProduct(productToCreate)
+            .then()
+            .log().body()
+            .statusCode(equalTo(HttpStatus.SC_UNPROCESSABLE_ENTITY))
+            .extract()
+            .as(ErrorResponseModel.class)
+            ;
+        assertThat(errorResponseModel.errors()).hasSize(1);
+        assertThat(errorResponseModel.errors().getFirst().getDetail())
+            .isEqualTo("price must be greater than or equal to 0.10");
+    }
+
+    @Test
     void a_product_name_cannot_exceed_200_characters() throws JSONException {
         var productToCreate = new JSONObject()
             .put("name", "A".repeat(201))
+            .put("price", 2.99)
             .put("labels", new JSONArray(Set.of()))
             ;
 
         createProduct(productToCreate)
             .then()
+            .log().body()
             .statusCode(equalTo(HttpStatus.SC_BAD_REQUEST))
             .body("message", equalTo("A product name cannot exceed 200 characters"))
         ;
